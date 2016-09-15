@@ -1,4 +1,4 @@
-var data = require('../data');
+var models = require('../models');
 var express = require('express');
 var router = express.Router();
 
@@ -7,31 +7,72 @@ var router = express.Router();
 //
 
 function getStudents(req,res,next)
-{
-    res.json(data.getAllBD('student'));
+{    
+    models.Student.findAll().then(function(s) {
+        res.json(s);
+    }); 
+    
 }
 
 function newStudent(req,res,next)
-{
-    var newId = data.addBD('student', req.body)
-    res.json({ studentId: newId });
+{    
+    models.Student.create({
+        name: req.body.name,
+        address: req.body.address,
+        class: req.body.class
+    }).then(function(i) {
+        res.json({
+            id: i.dataValues.id
+        });        
+    });
 }
 
 function getStudent(req,res,next)
-{    
-    res.json(data.getBD('student', req.params.id));
+{            
+    models.Student.findById(req.params.id).then(function(s) {
+        res.json(s);
+    });
 }
 
 function updateStudent(req,res,next)
-{
-    data.updateStudent(req.params.id, req.body)
-    res.sendStatus(200);
+{    
+    models.Student.update({
+        name: req.body.name,
+        address: req.body.address,
+        class: req.body.class
+    },
+    {
+        where: {
+            id: req.params.id
+        }
+    }).then(function(r){
+        if(r.length > 0)
+        {
+            res.sendStatus(200);
+        }
+        else
+        {
+            res.sendStatus(404);
+        }
+    });
 }
 
 function deleteStudent(req,res,next)
-{
-    data.deleteBD('student', req.params.id)
-    res.sendStatus(200);
+{    
+    models.Student.destroy({
+        where: {
+            id: req.params.id
+        }
+    }).then(function (r){
+        if(r > 0)
+        {
+            res.sendStatus(200);
+        }
+        else
+        {
+            res.sendStatus(404);
+        }
+    });
 }
 
 //

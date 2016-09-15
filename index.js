@@ -1,9 +1,11 @@
 
+require('dotenv').config();
 var express = require('express');
 var bodyParser = require('body-parser');
 var students = require('./routes/students.js');
 var courses = require('./routes/courses.js');
 var records = require('./routes/records.js');
+var models = require("./models");
 var app = express();
 
 // You can store key-value pairs in express, here we store the port setting
@@ -19,6 +21,9 @@ app.use('/api', records);
 
 
 // start listening for incoming HTTP connections
-app.listen(app.get('port'), function() {
-    console.log('Node app is running on port', app.get('port'));
+models.sequelize.sync().then(function() {
+    app.listen(app.get('port'), function() {
+        console.log('Node app is running on port', app.get('port'));
+    });
 });
+
